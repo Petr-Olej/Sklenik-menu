@@ -1,0 +1,244 @@
+/**************************************/
+/*      https://myhomethings.eu       */
+/*                                    */
+/**************************************/
+
+#include <LiquidCrystal_I2C.h>
+#include <DHT.h>
+
+DHT dht(22, DHT22);
+LiquidCrystal_I2C lcd(0x3F, 20, 4);   // I2C address: "0x3F" or "0x27"
+
+const byte upButtonPin = 11;
+const byte downButtonPin = 12;
+const byte rightButtonPin = 52;
+const byte leftButtonPin = 7;
+
+const byte ledPinGreen = 33;
+const byte ledPinOrange = 43; 
+
+int hladinaDum = 2000;
+int hladinaSklenik = 1520;
+boolean dumON = false;
+boolean sklenikON = false;
+
+unsigned long time_now = 0;
+float dhtTemp;
+float dhtHum;
+
+
+String MenuItems[] = {  // Your menu items
+  "Nadrz u domu",
+  "Nadrz u skleniku",
+  "Teplota",
+  "Vlhkost" 
+  // and so on... 
+};
+
+void menuFunctions(int menu, byte right, byte left)  // Your menu functions
+{
+  if(menu == 1) // nadrz u domu
+  {
+    lcd.setCursor(0, 2);
+    lcd.print("Zbyva     ");
+    lcd.setCursor(12, 2);
+    lcd.print(hladinaDum);
+    lcd.setCursor(17, 2);
+    lcd.print("l");
+    lcd.setCursor(0, 3);
+    lcd.print("Cerpadlo:");
+    lcd.setCursor(10, 3);
+    lcd.print("Off");
+    lcd.setCursor(16, 3);
+    lcd.print("On");
+
+    if(right == 1)
+    {
+      dumON = true;
+      digitalWrite(ledPinGreen, HIGH);
+    }
+    if(left == 1)
+    {
+      dumON = false;
+      digitalWrite(ledPinGreen, LOW);
+    }
+
+    if(dumON == true)
+    {
+      lcd.setCursor(13, 3);
+      lcd.print("  ");
+      lcd.setCursor(18, 3);
+      lcd.print("<<");
+    }
+    if(dumON == false)
+    {
+      lcd.setCursor(13, 3);
+      lcd.print("<<");
+      lcd.setCursor(18, 3);
+      lcd.print("  ");
+    }
+    
+    
+    
+  }
+  
+  if(menu == 2)         //nadrz u skleniku
+  {
+    lcd.setCursor(0, 2);
+    lcd.print("Zbyva:     ");
+    lcd.setCursor(12, 2);
+    lcd.print(hladinaSklenik);
+    lcd.setCursor(17, 2);
+    lcd.print("l");
+    lcd.setCursor(0, 3);
+    lcd.print("Cerpadlo:");
+    lcd.setCursor(10, 3);
+    lcd.print("Off");
+    lcd.setCursor(16, 3);
+    lcd.print("On");
+    
+    if(right == 1)
+    {
+      sklenikON = true;
+      digitalWrite(ledPinOrange, HIGH);
+    }
+    if(left == 1)
+    {
+      sklenikON = false;
+      digitalWrite(ledPinOrange, LOW);
+    }
+    
+    if(sklenikON == true)
+    {
+      lcd.setCursor(13, 3);
+      lcd.print("  ");
+      lcd.setCursor(18, 3);
+      lcd.print("<<");
+    }
+    if(sklenikON == false)
+    {
+      lcd.setCursor(13, 3);
+      lcd.print("<<");
+      lcd.setCursor(18, 3);
+      lcd.print("  ");
+    }
+    
+  }
+  
+  if(menu == 3)     // teplota
+  {
+    
+    dhtTemp = dht.readTemperature();
+    lcd.setCursor(0,2);
+    lcd.print("Vzduch:");
+    lcd.setCursor(10,2);
+    lcd.print(dhtTemp);
+    lcd.setCursor(16,2);
+    lcd.print((char)223);
+    lcd.setCursor(17,2);
+    lcd.print("C");
+  }
+
+ if(menu == 4)     // vlhkost
+  {
+    dhtHum = dht.readHumidity();
+    lcd.setCursor(0,2);
+    lcd.print("Vzduch:");
+    lcd.setCursor(10,2);
+    lcd.print(dhtHum);
+    lcd.setCursor(16,2);
+    lcd.print("%");
+
+  }
+  // and so on... 
+}
+
+
+/***  do not modify  ***********************************************/
+
+template < typename T, size_t NumberOfSize > 
+size_t MenuItemsSize(T (&) [NumberOfSize])
+{ 
+  return NumberOfSize; 
+}
+int numberOfMenuItems = MenuItemsSize(MenuItems) - 1;
+int currentMenuItem = 0;
+int previousMenuItem = 1;
+byte button_flag = 0;
+unsigned long previousMillis = millis();
+
+/*******************************************************************/
+
+void setup()
+{
+  pinMode(ledPinGreen, OUTPUT);
+  pinMode(ledPinOrange, OUTPUT);
+
+  /************************************/
+  pinMode(upButtonPin, INPUT_PULLUP);
+  pinMode(downButtonPin, INPUT_PULLUP);
+  pinMode(rightButtonPin, INPUT_PULLUP);
+  pinMode(leftButtonPin, INPUT_PULLUP);
+  
+  lcd.init();
+  lcd.backlight();
+  lcd.clear();
+  dht.begin();
+  
+}
+
+void loop() 
+{
+      
+      
+    
+  if(digitalRead(rightButtonPin) == LOW && button_flag == 0)
+  {
+    menuFunctions(currentMenuItem + 1, 1, 0);
+    button_flag = 1;
+    previousMillis = millis();
+
+  }
+  if(digitalRead(leftButtonPin) == LOW && button_flag == 0)
+  {
+    menuFunctions(currentMenuItem + 1, 0, 1);
+    button_flag = 1;
+    previousMillis = millis();
+
+  }
+  if(digitalRead(upButtonPin) == LOW && button_flag == 0)
+  {
+    ++currentMenuItem;
+    if(currentMenuItem > numberOfMenuItems )
+    {
+      currentMenuItem = numberOfMenuItems ;
+    }
+    button_flag = 1;
+    previousMillis = millis();
+
+  }
+  else if(digitalRead(downButtonPin) == LOW && button_flag == 0)
+  {
+    currentMenuItem--;
+    if(currentMenuItem < 0)
+    {
+      currentMenuItem = 0;
+    }
+    button_flag = 1;
+    previousMillis = millis();
+    
+  }
+  if(currentMenuItem != previousMenuItem)
+  {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(MenuItems [currentMenuItem]);
+    menuFunctions(currentMenuItem + 1, 0, 0);
+    previousMenuItem = currentMenuItem;
+  }
+  if(millis() - previousMillis >= 400) 
+  {
+    previousMillis = millis();
+    button_flag = 0;
+  }
+}
