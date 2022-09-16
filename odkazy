@@ -1,0 +1,15 @@
+
+------------------------------------------------------------------------------------- <LcdMenu.h>
+https://create.arduino.cc/projecthub/michi4/lcd-menu-tutorial-39173b
+
+https://github.com/forntoh/LcdMenu/discussions/45         // menu.lcd->print
+	
+https://github.com/forntoh/LcdMenu/discussions/9	 //  value update
+
+-------------------------------------------------------------------------------------- <LiquidCrystal_I2C.h>
+
+https://create.arduino.cc/projecthub/LuckyResistor/c-templates-for-embedded-code-95b42b			// template < typename T>
+
+https://cplusplus.com/reference/cstring/size_t/		// size_t	
+
+https://myhomethings.eu/en/dynamic-arduino-lcd-menu/	// cool navod
