@@ -19,144 +19,183 @@ boolean sklenikON = false;                           // logicky stav zalevaciho 
 
 float dhtTemp;                                       // teplota z DHT22
 float dhtHum;                                        // vlhkost z DHT22
+float dsTemp = 15.2;                                 // teplota z DS18B20
+float dsHum = 94.3;                                  // vlhkost z DS18B20
 
 
-String MenuPolozky[] = {                             // pole nazvu Polozek menu (jednotlivych stran)
+String MenuPolozky[] = {                             // pole nazvu polozek menu (jednotlivych stran)
   "Nadrz u domu",
   "Nadrz u skleniku",
   "Teplota",
   "Vlhkost" 
+  "Zmena casu zaliti"
+  "Zmena delky zaliti"
  };
 
-void menuFunctions(int menu, byte right, byte left)  // Zde se definuje, co se ma stat pri volbe dane polozky Menu
+void Zalej()
 {
-  if(menu == 1)                                      // nadrz u domu
-  {
-    lcd.setCursor(0, 2);
-    lcd.print("Zbyva     ");
-    lcd.setCursor(12, 2);
-    lcd.print(hladinaDum);
-    lcd.setCursor(17, 2);
-    lcd.print("l");
-    lcd.setCursor(0, 3);
-    lcd.print("Cerpadlo:");
-    lcd.setCursor(10, 3);
-    lcd.print("Off");
-    lcd.setCursor(16, 3);
-    lcd.print("On");
+   int start = millis();
+   digitalWrite(ledPinOrange, HIGH);
+   if(millis >= (start + dobaZalevani * 60000))
+   {
+     digitalWrite(ledPinOrange, LOW); 
+   }
+}
 
-    if(right == 1)
-    {
-      dumON = true;
-      digitalWrite(ledPinGreen, HIGH);
-    }
-    if(left == 1)
-    {
-      dumON = false;
-      digitalWrite(ledPinGreen, LOW);
-    }
-
-    if(dumON == true)
-    {
-      lcd.setCursor(13, 3);
-      lcd.print("  ");
-      lcd.setCursor(18, 3);
-      lcd.print("<<");
-    }
-    if(dumON == false)
-    {
-      lcd.setCursor(13, 3);
-      lcd.print("<<");
-      lcd.setCursor(18, 3);
-      lcd.print("  ");
-    }
-    
-    
-    
-  }
-  
-  if(menu == 2)                                      //nadrz u skleniku
-  {
-    lcd.setCursor(0, 2);
-    lcd.print("Zbyva:     ");
-    lcd.setCursor(12, 2);
-    lcd.print(hladinaSklenik);
-    lcd.setCursor(17, 2);
-    lcd.print("l");
-    lcd.setCursor(0, 3);
-    lcd.print("Cerpadlo:");
-    lcd.setCursor(10, 3);
-    lcd.print("Off");
-    lcd.setCursor(16, 3);
-    lcd.print("On");
-    
-    if(right == 1)
-    {
-      sklenikON = true;
-      digitalWrite(ledPinOrange, HIGH);
-    }
-    if(left == 1)
-    {
-      sklenikON = false;
-      digitalWrite(ledPinOrange, LOW);
-    }
-    
-    if(sklenikON == true)
-    {
-      lcd.setCursor(13, 3);
-      lcd.print("  ");
-      lcd.setCursor(18, 3);
-      lcd.print("<<");
-    }
-    if(sklenikON == false)
-    {
-      lcd.setCursor(13, 3);
-      lcd.print("<<");
-      lcd.setCursor(18, 3);
-      lcd.print("  ");
-    }
-    
-  }
-  
-  if(menu == 3)                                      // teplota
-  {
-    
-    dhtTemp = dht.readTemperature();
-    lcd.setCursor(0,2);
-    lcd.print("Vzduch:");
-    lcd.setCursor(10,2);
-    lcd.print(dhtTemp);
-    lcd.setCursor(16,2);
-    lcd.print((char)223);
-    lcd.setCursor(17,2);
-    lcd.print("C");
-  }
-
- if(menu == 4)                                       // vlhkost
-  {
-    dhtHum = dht.readHumidity();
-    lcd.setCursor(0,2);
-    lcd.print("Vzduch:");
-    lcd.setCursor(10,2);
-    lcd.print(dhtHum);
-    lcd.setCursor(16,2);
-    lcd.print("%");
-
-  }
-  
+void Cerpej()
+{
+   int start = millis();
+   digitalWrite(ledPinGreen, HIGH);
+   if(millis >= (start + dobaZalevani * 60000))
+   {
+     digitalWrite(ledPinGreen, LOW); 
+   }
 }
 
 
-                                                     // konstruktor
+void menuFunctions(int menu, byte right, byte left)  // Zde se definuje, co se ma stat pri volbe dane polozky Menu
+{
+  switch(menu)                                      
+  {
+    case 1:                                          // nadrz u domu
+    
+      lcd.setCursor(0, 2);
+      lcd.print("Zbyva     ");
+      lcd.setCursor(12, 2);
+      lcd.print(hladinaDum);
+      lcd.setCursor(17, 2);
+      lcd.print("l");
+      lcd.setCursor(0, 3);
+      lcd.print("Cerpadlo:");
+      lcd.setCursor(10, 3);
+      lcd.print("Off");
+      lcd.setCursor(16, 3);
+      lcd.print("On");
+
+      if(right == 1)
+      {
+        dumON = true;
+        digitalWrite(ledPinGreen, HIGH);
+        lcd.setCursor(13, 3);
+        lcd.print("  ");
+        lcd.setCursor(18, 3);
+        lcd.print("<<");
+      }
+      
+      if(left == 1)
+      {
+        dumON = false;
+        digitalWrite(ledPinGreen, LOW);
+        lcd.setCursor(13, 3);
+        lcd.print("<<");
+        lcd.setCursor(18, 3);
+        lcd.print("  ");
+      }
+     
+      break;
+     
+     
+    case 2:                                          //nadrz u skleniku
+  
+      lcd.setCursor(0, 2);
+      lcd.print("Zbyva:     ");
+      lcd.setCursor(12, 2);
+      lcd.print(hladinaSklenik);
+      lcd.setCursor(17, 2);
+      lcd.print("l");
+      lcd.setCursor(0, 3);
+      lcd.print("Cerpadlo:");
+      lcd.setCursor(10, 3);
+      lcd.print("Off");
+      lcd.setCursor(16, 3);
+      lcd.print("On");
+
+      if(right == 1)
+      {
+        sklenikON = true;
+        lcd.setCursor(13, 3);
+        lcd.print("  ");
+        lcd.setCursor(18, 3);
+        lcd.print("<<");
+        digitalWrite(ledPinOrange, HIGH);
+        lcd.setCursor(13, 3);
+        lcd.print("  ");
+        lcd.setCursor(18, 3);
+        lcd.print("<<");
+      }
+      
+      if(left == 1)
+      {
+        sklenikON = false;
+        digitalWrite(ledPinOrange, LOW);
+        lcd.setCursor(13, 3);
+        lcd.print("<<");
+        lcd.setCursor(18, 3);
+        lcd.print("  ");
+      }
+
+      break;
+    
+    
+    case 3:                                          // teplota
+                                
+      lcd.setCursor(0,2);
+      lcd.print("Vzduch:");
+      lcd.setCursor(10,2);
+      lcd.print(dhtTemp);
+      lcd.setCursor(16,2);
+      lcd.print((char)223);
+      lcd.setCursor(17,2);
+      lcd.print("C");
+      
+      lcd.setCursor(0,3);
+      lcd.print("Puda:");
+      lcd.setCursor(10,3);
+      lcd.print(dsTemp);
+      lcd.setCursor(16,3);
+      lcd.print((char)223);
+      lcd.setCursor(17,3);
+      lcd.print("C");
+      
+      break;
+
+    case 4:                                          // vlhkost
+      
+      lcd.setCursor(0,2);
+      lcd.print("Vzduch:");
+      lcd.setCursor(10,2);
+      lcd.print(dhtHum);
+      lcd.setCursor(16,2);
+      lcd.print("%");
+
+      lcd.setCursor(0,3);
+      lcd.print("Puda:");
+      lcd.setCursor(10,3);
+      lcd.print(dsHum);
+      lcd.setCursor(16,3);
+      lcd.print("%");
+      
+      break;
+      
+    case 5:                                          // nastaveni casu zalevani
+      
+      break;
+      
+    case 6:                                          // nastaveni delky zalevani
+    
+      break;
+}
+
+/*******************************************************************/
 
 template < typename T, size_t NumberOfSize > 
 size_t MenuItemsSize(T (&) [NumberOfSize])
 { 
   return NumberOfSize; 
 }
-int pocetPolozek = MenuItemsSize(MenuPolozky) - 1;                       numberOfMenuItems
-int aktPolozka = 0;                                                  currentMenuItem
-int prevPolozka = 1;                                 previousMenuItem
+int pocetPolozek = MenuItemsSize(MenuPolozky) - 1;                       
+int aktPolozka = 0;                                                  
+int prevPolozka = 1;                                 
 byte button_flag = 0;
 unsigned long previousMillis = millis();
 
@@ -182,8 +221,8 @@ void setup()
 
 void loop() 
 {
-      
-      
+   dhtHum = dht.readHumidity();   
+   dhtTemp = dht.readTemperature();
     
   if(digitalRead(rightButtonPin) == LOW && button_flag == 0)
   {
@@ -229,8 +268,11 @@ void loop()
     menuFunctions(aktPolozka + 1, 0, 0);
     prevPolozka = aktPolozka;
   }
+  
   if(millis() - previousMillis >= 400) 
   {
+    dhtTemp = dht.readTemperature();
+    dhtHum = dht.readHumidity();
     previousMillis = millis();
     button_flag = 0;
   }
