@@ -4,6 +4,8 @@
 DHT dht(22, DHT22);                                  // Inicializace DHT22
 LiquidCrystal_I2C lcd(0x3F, 20, 4);                  // Inicializace I2C LCD displaye s adresou "0x3F" 
 
+unsigned int delkaZalevani = 1;                      // delka zalevani v minutach
+
 const byte upButtonPin = 11;                         // A-pin posuvneho enkoderu
 const byte downButtonPin = 12;                       // B-pin posuvneho enkoderu
 const byte rightButtonPin = 52;                      // tlacitko pro posun vpravo ve volbach menu
@@ -36,7 +38,7 @@ void Zalej()
 {
    int start = millis();
    digitalWrite(ledPinOrange, HIGH);
-   if(millis >= (start + dobaZalevani * 60000))
+   if(millis >= (start + delkaZalevani * 60000))
    {
      digitalWrite(ledPinOrange, LOW); 
    }
@@ -46,7 +48,7 @@ void Cerpej()
 {
    int start = millis();
    digitalWrite(ledPinGreen, HIGH);
-   if(millis >= (start + dobaZalevani * 60000))
+   if(millis >= (start + delkaZalevani * 60000))
    {
      digitalWrite(ledPinGreen, LOW); 
    }
@@ -184,6 +186,7 @@ void menuFunctions(int menu, byte right, byte left)  // Zde se definuje, co se m
     case 6:                                          // nastaveni delky zalevani
     
       break;
+  }
 }
 
 /*******************************************************************/
