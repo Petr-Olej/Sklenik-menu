@@ -1,38 +1,36 @@
 #include <LiquidCrystal_I2C.h>
 #include <DHT.h>
 
-DHT dht(22, DHT22);                   // Inicializace DHT22
-LiquidCrystal_I2C lcd(0x3F, 20, 4);   // Inicializace I2C LCD displaye s adresou "0x3F" 
+DHT dht(22, DHT22);                                  // Inicializace DHT22
+LiquidCrystal_I2C lcd(0x3F, 20, 4);                  // Inicializace I2C LCD displaye s adresou "0x3F" 
 
-const byte upButtonPin = 11;          // A-pin posuvneho enkoderu
-const byte downButtonPin = 12;        // B-pin posuvneho enkoderu
-const byte rightButtonPin = 52;       // tlacitko pro posun vpravo ve volbach menu
-const byte leftButtonPin = 7;         // tlacitko pro posun vlevo ve volbach menu
+const byte upButtonPin = 11;                         // A-pin posuvneho enkoderu
+const byte downButtonPin = 12;                       // B-pin posuvneho enkoderu
+const byte rightButtonPin = 52;                      // tlacitko pro posun vpravo ve volbach menu
+const byte leftButtonPin = 7;                        // tlacitko pro posun vlevo ve volbach menu
 
-const byte ledPinGreen = 33;          // indikace zapnuti precerpavaciho cerpadla (nadrz u domu -> nadrz u skleniku) 
-const byte ledPinOrange = 43;         // indikace zapnuti zalevaciho cerpadla (nadrz u skleniku -> sklenik)
+const byte ledPinGreen = 33;                         // indikace zapnuti precerpavaciho cerpadla (nadrz u domu -> nadrz u skleniku) 
+const byte ledPinOrange = 43;                        // indikace zapnuti zalevaciho cerpadla (nadrz u skleniku -> sklenik)
 
-int hladinaDum = 2000;                // vyska hladiny v nadrzi u domu
-int hladinaSklenik = 1520;            // vyska hladiny v nadrzi u skleniku
-boolean dumON = false;                // logicky stav precerpavaciho cerpadla
-boolean sklenikON = false;            // logicky stav zalevaciho cerpadla
+int hladinaDum = 2000;                               // vyska hladiny v nadrzi u domu
+int hladinaSklenik = 1520;                           // vyska hladiny v nadrzi u skleniku
+boolean dumON = false;                               // logicky stav precerpavaciho cerpadla
+boolean sklenikON = false;                           // logicky stav zalevaciho cerpadla
 
-unsigned long time_now = 0;
-float dhtTemp;
-float dhtHum;
+float dhtTemp;                                       // teplota z DHT22
+float dhtHum;                                        // vlhkost z DHT22
 
 
-String MenuItems[] = {  // Your menu items
+String MenuPolozky[] = {                             // pole nazvu Polozek menu (jednotlivych stran)
   "Nadrz u domu",
   "Nadrz u skleniku",
   "Teplota",
   "Vlhkost" 
-  // and so on... 
-};
+ };
 
-void menuFunctions(int menu, byte right, byte left)  // Your menu functions
+void menuFunctions(int menu, byte right, byte left)  // Zde se definuje, co se ma stat pri volbe dane polozky Menu
 {
-  if(menu == 1) // nadrz u domu
+  if(menu == 1)                                      // nadrz u domu
   {
     lcd.setCursor(0, 2);
     lcd.print("Zbyva     ");
@@ -77,7 +75,7 @@ void menuFunctions(int menu, byte right, byte left)  // Your menu functions
     
   }
   
-  if(menu == 2)         //nadrz u skleniku
+  if(menu == 2)                                      //nadrz u skleniku
   {
     lcd.setCursor(0, 2);
     lcd.print("Zbyva:     ");
@@ -120,7 +118,7 @@ void menuFunctions(int menu, byte right, byte left)  // Your menu functions
     
   }
   
-  if(menu == 3)     // teplota
+  if(menu == 3)                                      // teplota
   {
     
     dhtTemp = dht.readTemperature();
@@ -134,7 +132,7 @@ void menuFunctions(int menu, byte right, byte left)  // Your menu functions
     lcd.print("C");
   }
 
- if(menu == 4)     // vlhkost
+ if(menu == 4)                                       // vlhkost
   {
     dhtHum = dht.readHumidity();
     lcd.setCursor(0,2);
@@ -145,20 +143,20 @@ void menuFunctions(int menu, byte right, byte left)  // Your menu functions
     lcd.print("%");
 
   }
-  // and so on... 
+  
 }
 
 
-/***  do not modify  ***********************************************/
+                                                     // konstruktor
 
 template < typename T, size_t NumberOfSize > 
 size_t MenuItemsSize(T (&) [NumberOfSize])
 { 
   return NumberOfSize; 
 }
-int numberOfMenuItems = MenuItemsSize(MenuItems) - 1;
-int currentMenuItem = 0;
-int previousMenuItem = 1;
+int pocetPolozek = MenuItemsSize(MenuPolozky) - 1;                       numberOfMenuItems
+int aktPolozka = 0;                                                  currentMenuItem
+int prevPolozka = 1;                                 previousMenuItem
 byte button_flag = 0;
 unsigned long previousMillis = millis();
 
@@ -189,24 +187,24 @@ void loop()
     
   if(digitalRead(rightButtonPin) == LOW && button_flag == 0)
   {
-    menuFunctions(currentMenuItem + 1, 1, 0);
+    menuFunctions(aktPolozka + 1, 1, 0);
     button_flag = 1;
     previousMillis = millis();
 
   }
   if(digitalRead(leftButtonPin) == LOW && button_flag == 0)
   {
-    menuFunctions(currentMenuItem + 1, 0, 1);
+    menuFunctions(aktPolozka + 1, 0, 1);
     button_flag = 1;
     previousMillis = millis();
 
   }
   if(digitalRead(upButtonPin) == LOW && button_flag == 0)
   {
-    ++currentMenuItem;
-    if(currentMenuItem > numberOfMenuItems )
+    ++aktPolozka;
+    if(aktPolozka > pocetPolozek )
     {
-      currentMenuItem = numberOfMenuItems ;
+      aktPolozka = pocetPolozek ;
     }
     button_flag = 1;
     previousMillis = millis();
@@ -214,22 +212,22 @@ void loop()
   }
   else if(digitalRead(downButtonPin) == LOW && button_flag == 0)
   {
-    currentMenuItem--;
-    if(currentMenuItem < 0)
+    aktPolozka--;
+    if(aktPolozka < 0)
     {
-      currentMenuItem = 0;
+      aktPolozka = 0;
     }
     button_flag = 1;
     previousMillis = millis();
     
   }
-  if(currentMenuItem != previousMenuItem)
+  if(aktPolozka != prevPolozka)
   {
     lcd.clear();
     lcd.setCursor(0, 0);
-    lcd.print(MenuItems [currentMenuItem]);
-    menuFunctions(currentMenuItem + 1, 0, 0);
-    previousMenuItem = currentMenuItem;
+    lcd.print(MenuPolozky [aktPolozka]);
+    menuFunctions(aktPolozka + 1, 0, 0);
+    prevPolozka = aktPolozka;
   }
   if(millis() - previousMillis >= 400) 
   {
